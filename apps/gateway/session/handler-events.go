@@ -43,6 +43,12 @@ var EventsHandleMap = map[eBroadcaster.EventType]EventsHandlersQueue{
 	eBroadcaster.EventTypeMMJoinedPVPQueue:           NewEventHandler("EventTypeMMJoinedPVPQueue", (*GameSession).HandleEventMMJoinedPVPQueue),
 	eBroadcaster.EventTypeMMInvitedToBGOrArena:       NewEventHandler("EventTypeMMInvitedToBGOrArena", (*GameSession).HandleEventMMInvitedToBGOrArena),
 	eBroadcaster.EventTypeMMInviteToBGOrArenaExpired: NewEventHandler("EventTypeMMInviteToBGOrArenaExpired", (*GameSession).HandleEventMMInviteToBGOrArenaExpired),
+
+	// Friends
+	eBroadcaster.EventTypeFriendStatusChange: NewEventHandler("FriendStatusChange", (*GameSession).HandleEventFriendStatusChange),
+	eBroadcaster.EventTypeFriendAdded:        NewEventHandler("FriendAdded", (*GameSession).HandleEventFriendAdded),
+	eBroadcaster.EventTypeFriendRemoved:      NewEventHandler("FriendRemoved", (*GameSession).HandleEventFriendRemoved),
+	eBroadcaster.EventTypeFriendNoteUpdate:   NewEventHandler("FriendNoteUpdate", (*GameSession).HandleEventFriendNoteUpdate),
 }
 
 type EventHandler func(*GameSession, context.Context, *eBroadcaster.Event) error

@@ -185,6 +185,13 @@ func (s *GameSession) HandlePackets(ctx context.Context) {
 				s.onWorldSocketClosed()
 				break
 			}
+
+			// Check if this opcode should be dropped (blacklisted)
+			if OpcodeBlacklist[p.Opcode] {
+				s.logger.Debug().Msgf("Dropped blacklisted opcode from worldserver: %d", p.Opcode)
+				break
+			}
+
 			handler, found := HandleMap[p.Opcode]
 			if !found {
 				if s.gameSocket != nil {
@@ -267,6 +274,8 @@ func (s *GameSession) Login(ctx context.Context, p *packet.Packet) error {
 	s.worldSocket = socket
 
 	err = s.eventsProducer.CharacterLoggedIn(&events.GWEventCharacterLoggedInPayload{
+		RealmID:     root.RealmID,
+		GatewayID:   root.RetrievedGatewayID,
 		CharGUID:    char.GUID,
 		CharName:    char.Name,
 		CharRace:    uint8(char.Race),
@@ -560,6 +569,8 @@ func (s *GameSession) onLoggedOut() {
 	}
 
 	err := s.eventsProducer.CharacterLoggedOut(&events.GWEventCharacterLoggedOutPayload{
+		RealmID:     root.RealmID,
+		GatewayID:   root.RetrievedGatewayID,
 		CharGUID:    s.character.GUID,
 		CharName:    s.character.Name,
 		CharGuildID: s.character.GuildID,

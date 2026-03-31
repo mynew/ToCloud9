@@ -132,6 +132,12 @@ func main() {
 		log.Fatal().Err(err).Msg("can't listen to matchmaking events-broadcaster")
 	}
 
+	friendsListener := service.NewFriendsNatsListener(nc, broadcaster)
+	err = friendsListener.Listen()
+	if err != nil {
+		log.Fatal().Err(err).Msg("can't listen to friends events-broadcaster")
+	}
+
 	producer := events.NewGatewayProducerNatsJSON(nc, root.Ver, root.RealmID, root.RetrievedGatewayID)
 	charsUpdsBarrier := service.NewCharactersUpdatesBarrier(&log.Logger, producer, time.Second)
 	go charsUpdsBarrier.Run(context.TODO())

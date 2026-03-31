@@ -13,6 +13,26 @@ type Broadcaster struct {
 	mock.Mock
 }
 
+// NewFriendAddedEvent provides a mock function with given fields: payload
+func (_m *Broadcaster) NewFriendAddedEvent(payload *events.FriendEventAddedPayload) {
+	_m.Called(payload)
+}
+
+// NewFriendNoteUpdateEvent provides a mock function with given fields: payload
+func (_m *Broadcaster) NewFriendNoteUpdateEvent(payload *events.FriendEventNoteUpdatePayload) {
+	_m.Called(payload)
+}
+
+// NewFriendRemovedEvent provides a mock function with given fields: payload
+func (_m *Broadcaster) NewFriendRemovedEvent(payload *events.FriendEventRemovedPayload) {
+	_m.Called(payload)
+}
+
+// NewFriendStatusChangeEvent provides a mock function with given fields: payload
+func (_m *Broadcaster) NewFriendStatusChangeEvent(payload *events.FriendEventStatusChangePayload) {
+	_m.Called(payload)
+}
+
 // NewGroupConvertedToRaidEvent provides a mock function with given fields: payload
 func (_m *Broadcaster) NewGroupConvertedToRaidEvent(payload *events.GroupEventGroupConvertedToRaidPayload) {
 	_m.Called(payload)

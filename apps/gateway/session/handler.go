@@ -10,6 +10,13 @@ import (
 	pbServ "github.com/walkline/ToCloud9/gen/servers-registry/pb"
 )
 
+// OpcodeBlacklist contains opcodes that should be dropped (not forwarded to client)
+// Used to block worldserver friend system packets since we handle friends at gateway level
+var OpcodeBlacklist = map[packet.Opcode]bool{
+	packet.SMsgFriendStatus:  true,
+	packet.SMsgContactList:   true,
+}
+
 var HandleMap = map[packet.Opcode]HandlersQueue{
 	packet.CMsgCharCreate:               NewHandler("CMsgCharCreate", (*GameSession).CreateCharacter),
 	packet.CMsgPlayerLogin:              NewHandler("CMsgPlayerLogin", (*GameSession).Login),
@@ -20,6 +27,15 @@ var HandleMap = map[packet.Opcode]HandlersQueue{
 	packet.CMsgMessageChat:              NewHandler("CMsgMessageChat", (*GameSession).HandleChatMessage),
 	packet.CMsgGuildQuery:               NewHandler("CMsgGuildQuery", (*GameSession).HandleGuildQuery),
 	packet.CMsgWho:                      NewHandler("CMsgWho", (*GameSession).HandleWho),
+
+	// Friends
+	packet.CMsgContactList:              NewHandler("CMsgContactList", (*GameSession).HandleContactList),
+	packet.CMsgAddFriend:                NewHandler("CMsgAddFriend", (*GameSession).HandleAddFriend),
+	packet.CMsgDelFriend:                NewHandler("CMsgDelFriend", (*GameSession).HandleDelFriend),
+	packet.CMsgSetContactNotes:          NewHandler("CMsgSetContactNotes", (*GameSession).HandleSetContactNotes),
+	packet.CMsgAddIgnore:                NewHandler("CMsgAddIgnore", (*GameSession).HandleAddIgnore),
+	packet.CMsgDelIgnore:                NewHandler("CMsgDelIgnore", (*GameSession).HandleDelIgnore),
+
 	packet.CMsgGuildInvite:              NewHandler("CMsgGuildInvite", (*GameSession).HandleGuildInvite),
 	packet.CMsgGuildInviteAccept:        NewHandler("CMsgGuildInviteAccept", (*GameSession).HandleGuildInviteAccept),
 	packet.CMsgGuildRoster:              NewHandler("CMsgGuildRoster", (*GameSession).HandleGuildRoster),

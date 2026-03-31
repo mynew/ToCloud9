@@ -39,6 +39,10 @@ const (
 	EventTypeMMJoinedPVPQueue
 	EventTypeMMInvitedToBGOrArena
 	EventTypeMMInviteToBGOrArenaExpired
+	EventTypeFriendStatusChange
+	EventTypeFriendAdded
+	EventTypeFriendRemoved
+	EventTypeFriendNoteUpdate
 )
 
 type IncomingWhisperPayload struct {
@@ -103,6 +107,11 @@ type Broadcaster interface {
 	NewMatchmakingJoinedPVPQueueEvent(payload *events.MatchmakingEventPlayersQueuedPayload)
 	NewMatchmakingInvitedToBGOrArenaEvent(payload *events.MatchmakingEventPlayersInvitedPayload)
 	NewMatchmakingInviteToBGOrArenaExpiredEvent(payload *events.MatchmakingEventPlayersInviteExpiredPayload)
+
+	NewFriendStatusChangeEvent(payload *events.FriendEventStatusChangePayload)
+	NewFriendAddedEvent(payload *events.FriendEventAddedPayload)
+	NewFriendRemovedEvent(payload *events.FriendEventRemovedPayload)
+	NewFriendNoteUpdateEvent(payload *events.FriendEventNoteUpdatePayload)
 }
 
 type broadcasterImpl struct {
@@ -423,6 +432,60 @@ func (b *broadcasterImpl) NewMatchmakingInviteToBGOrArenaExpiredEvent(payload *e
 			Type:    EventTypeMMInviteToBGOrArenaExpired,
 			Payload: payload,
 		}
+	}
+}
+
+func (b *broadcasterImpl) NewFriendStatusChangeEvent(payload *events.FriendEventStatusChangePayload) {
+	for _, ch := range b.channelsForGUIDs(payload.NotifyPlayers) {
+		ch <- Event{
+			Type:    EventTypeFriendStatusChange,
+			Payload: payload,
+		}
+	}
+}
+
+func (b *broadcasterImpl) NewFriendAddedEvent(payload *events.FriendEventAddedPayload) {
+	b.channelsMu.RLock()
+	ch, ok := b.channels[payload.PlayerGUID]
+	b.channelsMu.RUnlock()
+
+	if !ok {
+		return
+	}
+
+	ch <- Event{
+		Type:    EventTypeFriendAdded,
+		Payload: payload,
+	}
+}
+
+func (b *broadcasterImpl) NewFriendRemovedEvent(payload *events.FriendEventRemovedPayload) {
+	b.channelsMu.RLock()
+	ch, ok := b.channels[payload.PlayerGUID]
+	b.channelsMu.RUnlock()
+
+	if !ok {
+		return
+	}
+
+	ch <- Event{
+		Type:    EventTypeFriendRemoved,
+		Payload: payload,
+	}
+}
+
+func (b *broadcasterImpl) NewFriendNoteUpdateEvent(payload *events.FriendEventNoteUpdatePayload) {
+	b.channelsMu.RLock()
+	ch, ok := b.channels[payload.PlayerGUID]
+	b.channelsMu.RUnlock()
+
+	if !ok {
+		return
+	}
+
+	ch <- Event{
+		Type:    EventTypeFriendNoteUpdate,
+		Payload: payload,
 	}
 }
 
